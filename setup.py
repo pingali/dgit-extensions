@@ -29,7 +29,7 @@ setup(name='dgit_extensions',
       ],
       entry_points = {
           'dgit.plugins': [
-              'simplevalidator = dgit_extensions.simple_validator',
+              'simplevalidator = dgit_extensions.content_rule_validator',
           ]
       },
       zip_safe=False)

@@ -1,11 +1,11 @@
 #!/usr/bin/env python 
 
 import os, sys
-from dgitcore.validator import ValidatorBase
-from dgitcore.config import get_config 
+from dgitcore.plugins.validator import ValidatorBase
+from dgitcore.config import get_config, ChoiceValidator
 from dgitcore.helper import compute_sha256 
 
-class SimpleValidatorDefault(ValidatorBase):     
+class ContentRuleValidator(ValidatorBase):     
     """
     Simple validator backend for the datasets.
 
@@ -16,20 +16,27 @@ class SimpleValidatorDefault(ValidatorBase):
         self.enable = False 
         self.token = None 
         self.url = None 
-        super(SimpleValidatorDefault, self).__init__('simple-validator', 
-                                              'v0', 
-                                              "Simple validator extension")
+        super(ContentRuleValidator, self).__init__('content-rule-validator', 
+                                                   'v0', 
+                                                   "Apply content validation rules")
 
     def config(self, what='get', params=None): 
         
         if what == 'get': 
             return {
-                'name': 'simple-validator', 
+                'name': 'content-rule-validator', 
                 'nature': 'validator',
-                'variables': [], 
+                'variables': ['enable'], 
+                'defaults': { 
+                    'enable': {
+                        "value": 'y',
+                        "description": "Enable content validation",
+                        "validator": ChoiceValidator(['y','n'])
+                    },
+                }
             }
         else:
-            self.enable = 'y'
+            self.enable = params['content-rule-validator']['enable']
 
 
     def evaluate(self, repomanager, key): 
@@ -61,6 +68,6 @@ class SimpleValidatorDefault(ValidatorBase):
     
 def setup(mgr): 
     
-    obj = SimpleValidatorDefault()
+    obj = ContentRuleValidator() 
     mgr.register('validator', obj)
 
