@@ -29,7 +29,7 @@ setup(name='dgit_extensions',
       ],
       entry_points = {
           'dgit.plugins': [
-              'simplevalidator = dgit_extensions.content_rule_validator',
+              'mysql_generator = dgit_extensions.generators.mysql_generator',
           ]
       },
       zip_safe=False)
