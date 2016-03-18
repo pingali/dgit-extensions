@@ -1,6 +1,6 @@
 #!/usr/bin/env python 
 
-import os, sys, getpass, traceback 
+import os, sys, getpass, traceback,json 
 from dgitcore.helper import cd 
 from dgitcore.plugins.generator import GeneratorBase
 from dgitcore.config import get_config, ChoiceValidator, NonEmptyValidator 
@@ -96,8 +96,50 @@ class MySQLGenerator(GeneratorBase):
                     self.enable = 'n'
 
 
-    def  evaluate(self, repo, files, params=None): 
+    def execute(self, cur, query): 
+        """
+        Execute a query...
+        """
+
+        # Execute
+        rowcount = cur.execute(query)
         
+        # Gather metadata 
+        info = { 
+            'rowcount': rowcount
+        }
+
+        # Get schema 
+        mapping = MySQLdb.converters.conversions
+        schema = []
+        for field in cur.description: 
+            name = field[0]
+            ftype = mapping[field[1]][0]
+            if isinstance(ftype, tuple): 
+                ftype = "{} ({})".format(ftype[1].__name__, ftype[0])
+            schema.append({'name': name, 'type': ftype})
+
+        # Get content
+        content = ""
+        num_fields = len(cur.description)
+        field_names = [i[0] for i in cur.description]
+        content += "\t".join(field_names)
+        first = True
+        for row in cur.fetchall():
+            if first: 
+                for i,v in enumerate(row):
+                    schema[i]['sample'] = str(v)
+                first = False 
+            content += "\n" + "\t".join(list(row))
+
+        schema = json.dumps(schema, indent=4)
+        info = json.dumps(info, indent=4)
+        return (info, schema, content) 
+
+    def  evaluate(self, repo, files, params=None): 
+        """
+        Evaluate an SQL query, cache the results in server
+        """
         if len(files) == 0: 
             # Nothing to do 
             return [] 
@@ -112,22 +154,34 @@ class MySQLGenerator(GeneratorBase):
         result = []
         with cd(repo.rootdir): 
             for f in files: 
-                query = open(f, 'r').read()
-                cur.execute(query)                
-                
-                content = ""
-                num_fields = len(cur.description)
-                field_names = [i[0] for i in cur.description]
-                content += "\t".join(field_names)
-                for row in cur.fetchall():
-                    content += "\n" + "\t".join(list(row))
-                print(content)
+
+                if repo.cache_check(self.name, f + '.data'): 
+                    #print("Found in cache")
+                    result.append({
+                        'target': f,
+                        'generator': self.name,
+                        'status': 'OK',
+                        'message': 'Result already cached'
+                    })
+                    continue
+
+                # print("Not found in cache. So executing")
+                # Run the query 
+                query = open(f).read()
+                (info, schema, content) = self.execute(cur, query) 
+
+                # Save the results 
+                repo.cache_write(self.name, f + '.info', info) 
+                repo.cache_write(self.name, f + '.schema', schema) 
+                repo.cache_write(self.name, f + '.data', content) 
+
                 result.append({
                     'target': files[0],
                     'generator': self.name,
                     'status': 'OK',
-                    'message': ''
+                    'message': 'Executed the query'
                 })
+                
         return result 
 
 def setup(mgr): 
