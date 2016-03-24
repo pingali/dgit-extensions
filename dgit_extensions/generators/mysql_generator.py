@@ -136,7 +136,7 @@ class MySQLGenerator(GeneratorBase):
         info = json.dumps(info, indent=4)
         return (info, schema, content) 
 
-    def  evaluate(self, repo, files, params=None): 
+    def  evaluate(self, repo, files, force=False): 
         """
         Evaluate an SQL query, cache the results in server
         """
@@ -155,7 +155,8 @@ class MySQLGenerator(GeneratorBase):
         with cd(repo.rootdir): 
             for f in files: 
 
-                if repo.cache_check(self.name, f + '.data'): 
+                
+                if not force and repo.cache_check(self.name, f + '.data'): 
                     #print("Found in cache")
                     result.append({
                         'target': f,
