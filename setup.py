@@ -30,6 +30,7 @@ setup(name='dgit_extensions',
       entry_points = {
           'dgit.plugins': [
               'mysql_generator = dgit_extensions.generators.mysql_generator',
+              'simple_contact_anonymizer = dgit_extensions.security.simple_contact_anonymizer',
           ]
       },
       zip_safe=False)

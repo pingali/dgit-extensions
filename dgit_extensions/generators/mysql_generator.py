@@ -1,12 +1,13 @@
 #!/usr/bin/env python 
 
 import os, sys, getpass, traceback,json 
+from collections import OrderedDict 
 from dgitcore.helper import cd 
-from dgitcore.plugins.generator import GeneratorBase
+from dgitcore.plugins.transformer import TransformerBase
 from dgitcore.config import get_config, ChoiceValidator, NonEmptyValidator 
 import MySQLdb
 
-class MySQLGenerator(GeneratorBase):     
+class MySQLGenerator(TransformerBase):     
     """
     Simple generator backend for the datasets.
 
@@ -95,6 +96,10 @@ class MySQLGenerator(GeneratorBase):
                     print("Unable to connect to MySQL Server. Please check ini file") 
                     self.enable = 'n'
 
+    def autooptions(self): 
+        return OrderedDict([
+            ("files", ["*.sql"])
+        ])
 
     def execute(self, cur, query): 
         """
@@ -136,10 +141,13 @@ class MySQLGenerator(GeneratorBase):
         info = json.dumps(info, indent=4)
         return (info, schema, content) 
 
-    def  evaluate(self, repo, files, force=False): 
+    def  evaluate(self, repo, spec, force=False): 
         """
         Evaluate an SQL query, cache the results in server
         """
+        
+        files = spec.get('files', [])
+
         if len(files) == 0: 
             # Nothing to do 
             return [] 
@@ -154,15 +162,15 @@ class MySQLGenerator(GeneratorBase):
         result = []
         with cd(repo.rootdir): 
             for f in files: 
-
                 
-                if not force and repo.cache_check(self.name, f + '.data'): 
+                cachepath = repo.cache_path(self.name, f + '.data')                
+                if not force and repo.cache_check(cachepath):
                     #print("Found in cache")
                     result.append({
                         'target': f,
-                        'generator': self.name,
+                        'transformer': self.name,
                         'status': 'OK',
-                        'message': 'Result already cached'
+                        'message': 'Result already cached ({})'.format(cachepath['relative'])
                     })
                     continue
 
@@ -172,13 +180,13 @@ class MySQLGenerator(GeneratorBase):
                 (info, schema, content) = self.execute(cur, query) 
 
                 # Save the results 
-                repo.cache_write(self.name, f + '.info', info) 
-                repo.cache_write(self.name, f + '.schema', schema) 
-                repo.cache_write(self.name, f + '.data', content) 
+                for output in [['info', info], ['schema', schema], ['data', data]]:
+                    cachepath = repo.cache_path(self.name, f + "." + output[0])
+                    repo.cache_write(cachepath, output[1]) 
 
                 result.append({
                     'target': files[0],
-                    'generator': self.name,
+                    'transformer': self.name,
                     'status': 'OK',
                     'message': 'Executed the query'
                 })
@@ -188,5 +196,5 @@ class MySQLGenerator(GeneratorBase):
 def setup(mgr): 
 
     obj = MySQLGenerator() 
-    mgr.register('generator', obj)
+    mgr.register('transformer', obj)
 
