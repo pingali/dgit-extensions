@@ -15,7 +15,7 @@ from dgitcore.plugins.transformer import TransformerBase
 from dgitcore.config import get_config, ChoiceValidator, NonEmptyValidator 
 from dgitcore.exceptions import * 
 
-class SimpleContactAnonymizer(TransformerBase):     
+class SimpleTableAnonymizer(TransformerBase):     
     """
     Simple anonymizer for datasets
 
@@ -29,15 +29,15 @@ class SimpleContactAnonymizer(TransformerBase):
     """
     def __init__(self): 
         self.enable = 'y'
-        super(SimpleContactAnonymizer, self).__init__('simple-contact-anonymizer', 
+        super(SimpleTableAnonymizer, self).__init__('simple-table-anonymizer', 
                                               'v0', 
-                                              "Simple anonymizer for contacts")
+                                              "Simple anonymizer for tables")
         
     def config(self, what='get', params=None): 
         
         if what == 'get': 
             return {
-                'name': 'simple-contact-anonymizer',
+                'name': 'simple-table-anonymizer',
                 'nature': 'transformer',
                 'variables': []
             }
@@ -132,7 +132,7 @@ class SimpleContactAnonymizer(TransformerBase):
 
         return content.getvalue().strip('\r\n')
 
-    def  evaluate(self, repo, spec, force=False): 
+    def  evaluate(self, repo, spec, force, args): 
         """
         Evaluate an SQL query, cache the results in server
         """
@@ -182,6 +182,6 @@ class SimpleContactAnonymizer(TransformerBase):
 
 def setup(mgr): 
 
-    obj = SimpleContactAnonymizer()
+    obj = SimpleTableAnonymizer()
     mgr.register('transformer', obj)
 

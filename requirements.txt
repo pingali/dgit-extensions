@@ -1,1 +1,2 @@
 mysqlclient==1.3.7
+-e git+git@github.com:pingali/dgit@master#egg=dgit
