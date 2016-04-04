@@ -7,14 +7,14 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read().replace('.. :changelog:', '')
 
 
-setup(name='dgit_extensions',
+setup(name='dgit-extensions',
       version='0.1.1',
       description='dgit addons',
       url='http://github.com/pingali/dgit-extensions',
       author='Venkata Pingali',
       author_email='pingali@gmail.com',
       license='MIT',
-      keywords="dgit,addons",
+      keywords="dgit dataset versioning addons",
       install_requires=[
           'dgit',
           'mysqlclient',
