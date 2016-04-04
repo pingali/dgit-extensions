@@ -8,7 +8,7 @@ with open('HISTORY.rst') as history_file:
 
 
 setup(name='dgit_extensions',
-      version='0.1.2',
+      version='0.1.3',
       description='dgit addons',
       url='http://github.com/pingali/dgit-extensions',
       author='Venkata Pingali',
@@ -20,6 +20,10 @@ setup(name='dgit_extensions',
           'mysqlclient',
       ],
       packages=['dgit_extensions'],
+      package_dir={
+          'dgit_extensions': 'dgit_extensions'
+      },
+      include_package_data=True,
       classifiers=[
           'Development Status :: 3 - Alpha',
           'Intended Audience :: Developers',
