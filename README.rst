@@ -10,7 +10,7 @@ checks, anonymization, sampling etc.
 
 ::
 
-   $ pip install dgit-extensions 
+   $ pip install dgit_extensions 
 
    # The modules in bold are extensions from this repo 
    $ dgit plugins list 

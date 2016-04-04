@@ -7,8 +7,8 @@ with open('HISTORY.rst') as history_file:
     history = history_file.read().replace('.. :changelog:', '')
 
 
-setup(name='dgit-extensions',
-      version='0.1.1',
+setup(name='dgit_extensions',
+      version='0.1.2',
       description='dgit addons',
       url='http://github.com/pingali/dgit-extensions',
       author='Venkata Pingali',
