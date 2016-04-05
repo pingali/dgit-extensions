@@ -141,7 +141,7 @@ class MySQLGenerator(TransformerBase):
         info = json.dumps(info, indent=4)
         return (info, schema, content) 
 
-    def  evaluate(self, repo, spec, force=False): 
+    def  evaluate(self, repo, spec, force=False, args=[]): 
         """
         Evaluate an SQL query, cache the results in server
         """
