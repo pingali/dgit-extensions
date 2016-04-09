@@ -18,6 +18,7 @@ setup(name='dgit_extensions',
       install_requires=[
           'dgit',
           'mysqlclient',
+          'json-delta'
       ],
       packages=['dgit_extensions'],
       package_dir={
@@ -37,6 +38,7 @@ setup(name='dgit_extensions',
               'mysql_generator = dgit_extensions.generators.mysql_generator',
               'simple_table_anonymizer = dgit_extensions.security.simple_table_anonymizer',
               'simple_file_encryption = dgit_extensions.security.simple_file_encryptor',
+              'json_representation = dgit_extensions.representations.jsonformat',
           ]
       },
       zip_safe=False)

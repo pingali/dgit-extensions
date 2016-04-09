@@ -177,7 +177,7 @@ class MySQLGenerator(TransformerBase):
                 # print("Not found in cache. So executing")
                 # Run the query 
                 query = open(f).read()
-                (info, schema, content) = self.execute(cur, query) 
+                (info, schema, data) = self.execute(cur, query) 
 
                 # Save the results 
                 for output in [['info', info], ['schema', schema], ['data', data]]:
