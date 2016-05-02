@@ -33,8 +33,8 @@ class MySQLGenerator(TransformerBase):
                 'variables': ['enable', 'host', 'port', 'db', 'username', 'password'], 
                 'defaults': { 
                     'enable': {
-                        "value": 'y',
-                        "description": "Enable content validation",
+                        "value": 'n',
+                        "description": "Support MySQL query materialization",
                         "validator": ChoiceValidator(['y','n'])
                     },
                     'host': {
